@@ -66,6 +66,34 @@ fn handle_command(input: &str) {
             }
         },
 
+        "copy" => {
+          if parts.len() != 3 {
+              eprintln!("Usage: copy <origin> <dest>");
+              return;
+          }
+
+            let src = Path::new(parts[1]);
+            let dst = Path::new(parts[2]);
+
+            if let Err(error) = filesystem::copy_file(src, dst) {
+                eprintln!("Error to copy file: {}", error);
+            }
+        },
+
+        "move" => {
+          if parts.len() != 3 {
+              eprintln!("Usage: move <origin> <dest>");
+              return;
+          }
+
+            let src = Path::new(parts[1]);
+            let dst = Path::new(parts[2]);
+
+            if let Err(error) = filesystem::move_file(src, dst) {
+                eprintln!("Error to rename file: {}", error);
+            }
+        },
+
         _ => {
             eprintln!("Unknown command: {}", command);
             eprintln!("Type 'help' to show available commands");
@@ -77,6 +105,8 @@ fn show_help() {
     println!("Available Commands:");
     println!("  list <dir>                    List files of directory.");
     println!("  info <file or dir>            Show information of file or directory.");
+    println!("  copy <origem> <destino>       Copia um arquivo");
+    println!("  move <origem> <destino>       Move ou renomeia um arquivo");
     println!("  help                          Show help message.");
     println!("  exit                          Quits file manager.");
 }

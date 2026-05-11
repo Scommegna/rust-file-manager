@@ -28,3 +28,36 @@ pub fn show_info(path: &Path) -> io::Result<()> {
     
     Ok(())
 }
+
+pub fn copy_file(src: &Path, dst: &Path) -> io::Result<()> {
+    if !src.exists() {
+        return Err(io::Error::new(
+            io::ErrorKind::NotFound,
+            "File not found."
+        ))
+    }
+
+    if !src.is_file() {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidInput,
+            "Origin must be a file."
+        ))
+    }
+
+    fs::copy(src, dst)?;
+
+    Ok(())
+}
+
+pub fn move_file(src: &Path, dst: &Path) -> io::Result<()> {
+    if ! src.exists() {
+        return Err(io::Error::new(
+            io::ErrorKind::NotFound,
+            "Origin file not found",
+        ))
+    }
+
+    fs::rename(src, dst)?;
+    
+    Ok(())
+}
