@@ -1,5 +1,6 @@
 mod filesystem;
 
+use std::env;
 use std::io::{self, Write};
 use std::path::Path;
 
@@ -94,6 +95,42 @@ fn handle_command(input: &str) {
             }
         },
 
+        "delete" => {
+          if parts.len() != 2 {
+              eprintln!("Usage: delete <path>");
+              return;
+          }
+
+            let path = Path::new(parts[1]);
+
+            if let Err(error) = filesystem::delete_path(path) {
+                eprintln!("Error to delete: {}", error);
+            }
+        },
+
+        "cd" => {
+          if parts.len() != 2 {
+              eprintln!("Usage: cd <dir>");
+              return;
+          }
+
+            let path = Path::new(parts[1]);
+
+            if let Err(error) = env::set_current_dir(path) {
+                eprintln!("Error to change directory: {}", error);
+                return;
+            }
+
+            match env::current_dir() {
+                Ok(current_path) => {
+                    println!("Current directory: {}", current_path.display());
+                }
+                Err(error) => {
+                    eprintln!("Error to obtaion current directory: {}", error);
+                }
+            }
+        },
+
         _ => {
             eprintln!("Unknown command: {}", command);
             eprintln!("Type 'help' to show available commands");
@@ -105,8 +142,10 @@ fn show_help() {
     println!("Available Commands:");
     println!("  list <dir>                    List files of directory.");
     println!("  info <file or dir>            Show information of file or directory.");
-    println!("  copy <origem> <destino>       Copia um arquivo");
-    println!("  move <origem> <destino>       Move ou renomeia um arquivo");
+    println!("  copy <origin> <dest>          Copies a file.");
+    println!("  move <origin> <dest>          Rename file");
+    println!("  delete <file_or_dir>          Remove file or directory");
+    println!("  cd <dir>                      Changes current directory");
     println!("  help                          Show help message.");
     println!("  exit                          Quits file manager.");
 }

@@ -58,6 +58,28 @@ pub fn move_file(src: &Path, dst: &Path) -> io::Result<()> {
     }
 
     fs::rename(src, dst)?;
-    
+
+    Ok(())
+}
+
+pub fn delete_path(path: &Path) -> io::Result<()> {
+    if !path.exists() {
+        return Err(io::Error::new(
+            io::ErrorKind::NotFound,
+            "Path not found"
+        ));
+    }
+
+    if path.is_file() {
+        fs::remove_file(path)?;
+    } else if path.is_dir() {
+        fs::remove_dir_all(path)?;
+    } else {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidInput,
+            "Path type not supported."
+        ))
+    }
+
     Ok(())
 }
