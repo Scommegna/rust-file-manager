@@ -1,4 +1,6 @@
 mod filesystem;
+mod tree;
+mod search;
 
 use std::env;
 use std::io::{self, Write};
@@ -131,6 +133,33 @@ fn handle_command(input: &str) {
             }
         },
 
+        "tree" => {
+          if parts.len() != 2 {
+              eprintln!("Usage: tree <dir>");
+              return;
+          }
+
+            let path = Path::new(parts[1]);
+
+            if let Err(error) = tree::print_tree(path) {
+                eprintln!("Error to print folder tree: {}", error)
+            }
+        },
+
+        "search" => {
+          if parts.len() != 3 {
+              eprintln!("Usage: search <name> <dir>");
+              return;
+          }
+
+            let target = parts[1];
+            let dir = Path::new(parts[2]);
+
+            if let Err(error) = search::search_by_name(target, dir) {
+                eprintln!("Error to search file: {}", error);
+            }
+        },
+
         _ => {
             eprintln!("Unknown command: {}", command);
             eprintln!("Type 'help' to show available commands");
@@ -146,6 +175,8 @@ fn show_help() {
     println!("  move <origin> <dest>          Rename file");
     println!("  delete <file_or_dir>          Remove file or directory");
     println!("  cd <dir>                      Changes current directory");
+    println!("  tree <dir>                    Show folder tree");
+    println!("  search <name> <dir>           Search files or directories by name");
     println!("  help                          Show help message.");
     println!("  exit                          Quits file manager.");
 }
