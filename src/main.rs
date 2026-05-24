@@ -1,3 +1,4 @@
+mod benchmark;
 mod filesystem;
 mod tree;
 mod search;
@@ -36,9 +37,27 @@ fn main() {
 }
 
 fn handle_command(input: &str) {
-    let parts: Vec<&str> = input.split_whitespace().collect();
+    let benchmark_enabled = input
+        .split_whitespace()
+        .any(|part| part == "--benchmark" || part == "-b");
+
+    let parts: Vec<&str> = input
+        .split_whitespace()
+        .filter(|part| *part != "--benchmark" && *part != "-b")
+        .collect();
+
+    if parts.is_empty() {
+        eprintln!("No command provided.");
+        return;
+    }
 
     let command = parts[0];
+
+    let benchmark = if benchmark_enabled {
+        Some(benchmark::Benchmark::start_benchmark())
+    } else {
+        None
+    };
 
     match command {
         "help" => show_help(),
@@ -177,6 +196,11 @@ fn handle_command(input: &str) {
             eprintln!("Type 'help' to show available commands");
         }
     }
+
+    if let Some(benchmark) = benchmark {
+        let result = benchmark.stop_benchmark();
+        benchmark::print_benchmark(&result);
+    }
 }
 
 fn show_help() {
@@ -189,6 +213,7 @@ fn show_help() {
     println!("  cd <dir>                               Changes current directory");
     println!("  tree <dir>                             Show folder tree");
     println!("  search <name> <dir> [threads]          Search files or directories by name");
+    println!("  --benchmark, -b                        Print execution time and resident memory");
     println!("  help                                   Show help message.");
     println!("  exit                                   Quits file manager.");
 }
