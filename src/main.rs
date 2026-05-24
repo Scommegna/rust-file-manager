@@ -147,15 +147,27 @@ fn handle_command(input: &str) {
         },
 
         "search" => {
-          if parts.len() != 3 {
-              eprintln!("Usage: search <name> <dir>");
+          if parts.len() != 3 && parts.len() != 4 {
+              eprintln!("Usage: search <name> <dir> [threads]");
               return;
           }
 
             let target = parts[1];
             let dir = Path::new(parts[2]);
 
-            if let Err(error) = search::search_by_name(target, dir) {
+            let threads = if parts.len() == 4 {
+                match parts[3].parse::<usize>() {
+                    Ok(value) => Some(value),
+                    Err(_) => {
+                        eprintln!("Threads number must be an integer.");
+                        return;
+                    }
+                }
+            } else {
+                None
+            };
+
+            if let Err(error) = search::search_by_name(target, dir, threads) {
                 eprintln!("Error to search file: {}", error);
             }
         },
@@ -169,14 +181,14 @@ fn handle_command(input: &str) {
 
 fn show_help() {
     println!("Available Commands:");
-    println!("  list <dir>                    List files of directory.");
-    println!("  info <file or dir>            Show information of file or directory.");
-    println!("  copy <origin> <dest>          Copies a file.");
-    println!("  move <origin> <dest>          Rename file");
-    println!("  delete <file_or_dir>          Remove file or directory");
-    println!("  cd <dir>                      Changes current directory");
-    println!("  tree <dir>                    Show folder tree");
-    println!("  search <name> <dir>           Search files or directories by name");
-    println!("  help                          Show help message.");
-    println!("  exit                          Quits file manager.");
+    println!("  list <dir>                             List files of directory.");
+    println!("  info <file or dir>                     Show information of file or directory.");
+    println!("  copy <origin> <dest>                   Copies a file.");
+    println!("  move <origin> <dest>                   Rename file");
+    println!("  delete <file_or_dir>                   Remove file or directory");
+    println!("  cd <dir>                               Changes current directory");
+    println!("  tree <dir>                             Show folder tree");
+    println!("  search <name> <dir> [threads]          Search files or directories by name");
+    println!("  help                                   Show help message.");
+    println!("  exit                                   Quits file manager.");
 }
